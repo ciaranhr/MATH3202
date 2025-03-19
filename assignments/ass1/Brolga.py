@@ -1,3 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Mar 12 15:22:32 2025
+
+MATH3202_A1
+Brolga Fire Management
+"""
+from gurobipy import *
+import math
+
+##DATA
 # ID, X, Y, Fuel needed (L)
 Sites = [
 [0,388,103,241],

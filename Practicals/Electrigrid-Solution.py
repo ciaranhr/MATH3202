@@ -65,12 +65,12 @@ m = Model("Electrigrid")
 
 # X[n] amount to generate a node n
 X = { n: m.addVar() for n in N }
-
+ 
 # Y[e] amount to send on edge e
 Y = { e: m.addVar() for e in E }
-
+ 
 # Objective
-
+ 
 m.setObjective(quicksum(hoursrunning*cost[g]*X[g] for g in cost))
 
 # Constraints
