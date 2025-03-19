@@ -300,9 +300,7 @@ Y = { r: m.addVar() for r in R }
 
 # Objective
 # Minimise total cost of fuel and transport
-#m.setObjective(quicksum(cost[w]*X[w] for w in cost + quicksum(0.81*Y[r]*Roads[r][3] for r in R)))
-#m.setObjective(quicksum(cost[w]*X[w] + 0.81*Y[r]*Roads[r][3] for w in cost for r in R))
-m.setObjective(quicksum(cost[w]*X[w] for w in cost))
+m.setObjective(quicksum(cost[w]*X[w] for w in cost) + quicksum(loss*Roads[r][3]*Y[r] for r in R))
 
 
 # Constraints
