@@ -278,6 +278,9 @@ cost = { 6: 8.46, 20: 7.35, 34: 8.14, 54: 12.66}
 #Cost of transporting fuel along a road
 loss = 0.76 #$/L/km
 
+#evaporation along a road
+evap = 0.05 #%/km
+
 N = range(len(Sites))
 R = range(len(Roads))
 
@@ -305,8 +308,8 @@ for n in N:
 
 # Flow balance
 for n in N:
-    m.addConstr(X[n] + quicksum(Y[r] for r in R if Roads[r][2] == n) == 
-                Sites[n][3] + quicksum(Y[r] for r in R if Roads[r][1] == n))
+    m.addConstr(X[n] + quicksum(
+        (1-evap*Roads[r][3]/100)*Y[r] for r in R if Roads[r][2] == n) == Sites[n][3] + quicksum(Y[r] for r in R if Roads[r][1] == n))
     
 for r in R:
     m.addConstr(Y[r] <= Roads[r][4])
