@@ -29,7 +29,7 @@ Sell = 150
 MinH = 3
 MaxH = 6
 
-m.setObjective(quicksum((Sell - c[i][]) * X[i] for i in I), GRB.MAXIMIZE)
+m.setObjective(quicksum((Sell - c[i][t]) * X[i] for i in I for t in T), GRB.MAXIMIZE)
 
 
 m.addConstr(quicksum(X[i] for i in I if veg[i]) <= MaxV)

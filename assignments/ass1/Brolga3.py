@@ -1,17 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Mar 12 15:22:32 2025
-
-MATH3202_A1
-Brolga Fire Management
-"""
-from gurobipy import *
-import math
-import Brolga4
-
-
-##DATA
-# ID, X, Y, Fuel needed (L), Suppressant needed(L)
+# ID, X, Y, Fuel needed (L), Suppressant needed (L)
 Sites = [
 [0,388,103,241,85],
 [1,134,282,83,30],
@@ -69,6 +56,7 @@ Sites = [
 [53,356,107,295,118],
 [54,225,78,0,0],
 [55,279,115,219,54]]
+
 # ID, Site1, Site2, Distance (km), Capacity (L)
 Roads = [
 [0,0,3,61,650],
@@ -270,78 +258,3 @@ Roads = [
 [196,5,17,50,1250],
 [197,17,5,50,900]]
 
-
-# Warehouse Data
-# Maximum Stock/ Capacity (L) and Cost ($/L) for each warehouse node for fuel and suppressant
-capacity = { 6: (3500, 1400), 20: (2200, 700), 34: (2900, 1100), 54: (2000, 800)}
-#capacityoriginal = { 6: 1400, 20: 700, 34: 1100, 54: 800}
-cost = { 6: (8.46, 3.25), 20: (7.35, 3.42), 34: (8.14, 4.40), 54: (12.66, 5.58)}
-#costoriginal = { 6: 3.25, 20: 3.42, 34: 4.40, 54: 5.58}
-
-Years = [2025, 2026, 2027, 2028, 2029]
-
-#Cost of transporting fuel along a road
-loss = 0.76 #$/L/km
-loss1 = [0.76, 0.79, 0.83, 0.84, 0.89]
-
-#evaporation along a road
-evap = 0.05 #%/km
-
-T = range(len(Years))
-N = range(len(Sites))
-R = range(len(Roads))
-
-m = Model("Brolga")
-
-# Variables
-# X[n] amount of fuel to purchase at a node n (L)
-X = {(n, t): m.addVar() for n in N for t in T}
-# Z[n] amount of suppressant to purchase at a node n (L)
-Z = {(n, t): m.addVar() for n in N for t in T}
-# Y[e] amount of fuel to send on road r (L)
-Y = {(r, t): m.addVar() for r in R for t in T}
-# V[e] amount of suppressant to send on road r (L)
-V = {(r, t): m.addVar() for r in R for t in T}
- 
-# Objective
-# Minimise total cost of fuel and transport
-m.setObjective(quicksum(cost[w][0] * X[w] + cost[w][1] * Z[w] for w in cost) + quicksum(loss * Roads[r][3] * (Y[r] + V[r]) for r in R))
-
-
-# Constraints
-# Production
-for n in N:
-    if n in capacity:
-        m.addConstr(X[n] <= capacity[n][0])
-        m.addConstr(Z[n] <= capacity[n][1])
-    else:
-        m.addConstr(X[n] <= 0) 
-        m.addConstr(Z[n] <= 0)
-
-# Flow balance
-for n in N:
-    #fuel balance
-    m.addConstr(X[n] + quicksum(
-        (1-evap*Roads[r][3]/100)*Y[r] for r in R if Roads[r][2] == n) == Sites[n][3] + quicksum(Y[r] for r in R if Roads[r][1] == n))
-    #Suppressant balance
-    m.addConstr(Z[n] + quicksum(V[r] for r in R if Roads[r][2] == n) ==
-                Sites[n][4] + quicksum(V[r] for r in R if Roads[r][1] == n))
-    
-for r in R:
-    m.addConstr(Y[r] + V[r] <= Roads[r][4])
-
-m.optimize()
-
-print("Total cost $",m.ObjVal)
-for w in cost:
-    print("Warehouse",w,":",X[w].x, "L")
-
-for w in cost:
-    print("Warehouse", w, ": $", X[w].x)
-
-
-F_req = quicksum(Sites[n][3] for n in N)
-print("total fuel req:", F_req)
-
-R_tot = quicksum(Roads[r][3] for r in R)
-print("total length of roads:", R_tot)
