@@ -298,11 +298,17 @@ m = Model("Brolga")
 X = {(n, t): m.addVar() for n in N for t in T}
 # Z[n] amount of suppressant to purchase at a node n (L)
 Z = {(n, t): m.addVar() for n in N for t in T}
+
 # Y[e] amount of fuel to send on road r (L)
 Y = {(r, t): m.addVar() for r in R for t in T}
 # V[e] amount of suppressant to send on road r (L)
 V = {(r, t): m.addVar() for r in R for t in T}
- 
+
+# F[n] amount of fuel to store at a node n (L)
+F = {(n,t): m.addVar() for n in N for t in T}
+# S[n] amount of fuel to store at a node n (L)
+S = {(n,t): m.addVar() for n in N for t in T}
+
 # Objective
 # Minimise total cost of fuel and transport
 m.setObjective(quicksum(cost[w][0] * X[w] + cost[w][1] * Z[w] for w in cost) + quicksum(loss * Roads[r][3] * (Y[r] + V[r]) for r in R))
