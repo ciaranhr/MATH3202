@@ -72,8 +72,9 @@ for t in T:
         else:
             fp.addConstr(S[p,0] == X[p,0] - Y[p,0])
     
-    for p in P:
-        fp.addConstr(S[p,T[-1]] >= endstore)
+for p in P:
+    fp.addConstr(S[p,T[-1]] >= endstore)
 
+    
 
-    fp.optimize()
+fp.optimize()
