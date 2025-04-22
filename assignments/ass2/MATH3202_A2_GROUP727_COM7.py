@@ -190,18 +190,13 @@ m.setObjective(quicksum(X[r,j]*Y[j,s]*Rangers[r][s] for j in J for r in R for s 
 
 ###    CONSTRAINTS    ###
 for j in J:
-    # Correct number of ranger allocated to each job
-    #m.addConstr(quicksum(X[r,j] for r in R) == Jobs[j]['rangers']) #if below lines arent neccessary
-    m.addConstr(quicksum(X[r,j] for r in R) >= 0.9*Jobs[j]['rangers'])
-    m.addConstr(quicksum(X[r,j] for r in R) <= 1.1*Jobs[j]['rangers'])
+    # Correct number of rangers allocated to each job
+    m.addConstr(quicksum(X[r,j] for r in R) == Jobs[j]['rangers'])
    
     # Avoid kinship clashing rangers working the same job
     for clash in clashes:
         m.addConstr(X[clash[0],j] + X[clash[1],j] <= 1.9)   
-    #m.addConstr(X[17,j] + X[18,j] <= 1.9)
-    #m.addConstr(X[2,j] + X[4,j] <= 1.9)
-    #m.addConstr(X[12,j] + X[15,j] <= 1.9)
-    #m.addConstr(X[8,j] + X[13,j] <= 1.9)
+
   
     
 for r in R:    
