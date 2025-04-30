@@ -203,17 +203,16 @@ m.setObjective(quicksum(X[r,j,t]*Y[j,s]*Rangers[r][s] for j in J for r in R for 
 
 
 ###    CONSTRAINTS    ###
+#For each day the following constraints hold
 for t in T:
-    #For each day the following constraints hold
     for j in J:
-        
         # Avoid kinship clashing rangers working the same job
         for clash in clashes:
             m.addConstr(X[clash[0],j,t] + X[clash[1],j,t] <= 1.9)   
       
         # Jobs can only be allocated on the correct day
         if t == Jobs[j]['day']:
-            # Correct number of ranger allocated to each jo
+            # Correct number of ranger allocated to each job
             m.addConstr(quicksum(X[r,j,t] for r in R) == Jobs[j]['rangers'])
         
         else:
@@ -226,6 +225,7 @@ for t in T:
         m.addConstr(quicksum(X[r,j,t]*Jobs[j]['duration'] for j in J) <= u*Z[r,t])
         
     for r in family:
+        #Rangers with family commitments cannot work 2 days in a row.
         m.addConstr(Z[r,T[t-1]] + Z[r, t] <= 1.9)
         
 for r in R:    
@@ -263,17 +263,25 @@ for t in T:
 #             rangers_alocated.append(r)
 #     print(Jobs[j]['title'], ":", rangers_alocated)
 
-# #ALLOCATION OF HOURS
-# workable_hours = 0
-# for j in J:
-#     workable_hours += Jobs[j]['rangers']*Jobs[j]['duration']
+#ALLOCATION OF HOURS
+workable_hours = 0
+for j in J:
+    workable_hours += Jobs[j]['rangers']*Jobs[j]['duration']
     
 
-# tot_hours_worked = 0
-# for r in R:
-#     hours_worked = 0
-#     for j in J:
-#         hours_worked += X[r,j].x*Jobs[j]['duration']
-#     tot_hours_worked += hours_worked 
-#     print("Ranger", r, ":", hours_worked, "hours")
-# print("Workable Hours", workable_hours, "Total Hours Worked", tot_hours_worked)
+
+tot_hours_worked = 0
+rangers_hours = {r : 0 for r in R}
+for t in T:
+    print(Days[t], ".........................................")
+    for r in R:
+        hours_worked = 0
+        for j in J:
+            hours_worked += X[r,j,t].x*Jobs[j]['duration']
+        tot_hours_worked += hours_worked 
+        rangers_hours[r] += hours_worked
+        print("Ranger", r, ":", hours_worked, "hours")
+    print("Workable Hours", workable_hours, "Total Hours Worked", tot_hours_worked)
+print(sorted(rangers_hours.items(), key=lambda x:x[1]))
+
+print((6 + 13 + 17 + 20 + 22 + 22 + 24)/7)

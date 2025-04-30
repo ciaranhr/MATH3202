@@ -133,6 +133,8 @@ Jobs = [
     {'title': 'Feral Pig Control', 'skills': [0,9,10], 'rangers': 2, 'duration': 4 }
 ]
 
+sorted_jobs = sorted(Jobs, key=lambda x:x['title'])
+
 # Skill scores for each ranger
 Rangers = [
     [1,0,9,11,20,8,5,9,4,6,0,7,1,2,3,18],
@@ -171,7 +173,7 @@ Y = np.zeros((len(J),len(S)))
 for j in J:
     #loop through columns of Y (Skills)
     for s in S:
-        if s in Jobs[j]['skills']:
+        if s in sorted_jobs[j]['skills']:
             Y[j,s] = 1
 
 #List of tuples each containing two ranger wo cannot work the same job
@@ -190,8 +192,8 @@ m.setObjective(quicksum(X[r,j]*Y[j,s]*Rangers[r][s] for j in J for r in R for s 
 
 ###    CONSTRAINTS    ###
 for j in J:
-    # Correct number of rangers allocated to each job
-    m.addConstr(quicksum(X[r,j] for r in R) == Jobs[j]['rangers'])
+    # Correct number of ranger allocated to each job
+    m.addConstr(quicksum(X[r,j] for r in R) == sorted_jobs[j]['rangers'])
    
     # Avoid kinship clashing rangers working the same job
     for clash in clashes:
@@ -201,7 +203,7 @@ for j in J:
     
 for r in R:    
     # Rangers do not exceed total number of workable hours.
-    m.addConstr(quicksum(X[r,j]*Jobs[j]['duration'] for j in J) <= tot_hours)
+    m.addConstr(quicksum(X[r,j]*sorted_jobs[j]['duration'] for j in J) <= tot_hours)
     
 
 m.optimize()
@@ -213,7 +215,7 @@ print("Maximum Total Skill Points",m.ObjVal)
 for j in J:
     for clash in clashes:
         C = X[clash[0],j].x + X[clash[1],j].x 
-    print(Jobs[j]['title'], "clash total is:", C)
+    print(sorted_jobs[j]['title'], "clash total is:", C)
 
 #ALLOCATION OF JOBS
 for j in J:
@@ -221,19 +223,23 @@ for j in J:
     for r in R:
         if X[r,j].x == 1:
             rangers_alocated.append(r)
-    print(Jobs[j]['title'], ":", rangers_alocated)
+    print(sorted_jobs[j]['title'], ":", rangers_alocated)
 
 #ALLOCATION OF HOURS
 workable_hours = 0
 for j in J:
-    workable_hours += Jobs[j]['rangers']*Jobs[j]['duration']
+    workable_hours += sorted_jobs[j]['rangers']*sorted_jobs[j]['duration']
     
 
+rangers_hours = {}
 tot_hours_worked = 0
 for r in R:
     hours_worked = 0
     for j in J:
-        hours_worked += X[r,j].x*Jobs[j]['duration']
-    tot_hours_worked += hours_worked 
-    print("Ranger", r, ":", hours_worked, "hours")
+        hours_worked += X[r,j].x*sorted_jobs[j]['duration']
+    tot_hours_worked += hours_worked
+    rangers_hours[r] = hours_worked 
 print("Workable Hours", workable_hours, "Total Hours Worked", tot_hours_worked)
+
+print(sorted(rangers_hours.items(), key= lambda x:x[1]))
+print((0+5+7+12+17+17+24)/7)

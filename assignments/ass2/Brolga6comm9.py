@@ -162,6 +162,9 @@ T = range(len(Days))
 
 clashes = [(10,11), (5,15), (8,16), (14,15)]
 
+#List of rangers who cannot work two days in a row
+family = [2, 3, 6, 12, 18]
+
 #Binary variable mapping each skill to each job
 Y = np.zeros((len(J),len(S)))
 #loop through rows of Y (Jobs)
@@ -209,6 +212,8 @@ for t in T:
         #Rangers do not exceed maximum workable hours per day
         m.addConstr(quicksum(X[r,j,t]*Jobs[j]['duration'] for j in J) <= u*Z[r,t])
         
+    for r in family:
+        m.addConstr(Z[r,T[t-1]] + Z[r, t] <= 1.9)       
         #Link Y variable with X variable
         #m.addConstr(Y[r,t]< X[r,j,t])
         

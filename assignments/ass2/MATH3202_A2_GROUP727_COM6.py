@@ -133,6 +133,8 @@ Jobs = [
     {'title': 'Feral Pig Control', 'skills': [0,9,10], 'rangers': 2, 'duration': 4 }
 ]
 
+sorted_jobs = sorted(Jobs, key=lambda x:x['title'])
+
 # Skill scores for each ranger
 Rangers = [
     [1,0,9,11,20,8,5,9,4,6,0,7,1,2,3,18],
@@ -171,7 +173,7 @@ Y = np.zeros((len(J),len(S)))
 for j in J:
     #loop through columns of Y (Skills)
     for s in S:
-        if s in Jobs[j]['skills']:
+        if s in sorted_jobs[j]['skills']:
             Y[j,s] = 1
     
     
@@ -190,11 +192,11 @@ m.setObjective(quicksum(X[r,j]*Y[j,s]*Rangers[r][s] for j in J for r in R for s 
 ###    CONSTRAINTS    ###
 for j in J:
     # Correct number of ranger allocated to each job
-    m.addConstr(quicksum(X[r,j] for r in R) >= 0.9*Jobs[j]['rangers'])
-    m.addConstr(quicksum(X[r,j] for r in R) <= 1.1*Jobs[j]['rangers'])
+    m.addConstr(quicksum(X[r,j] for r in R) >= 0.9*sorted_jobs[j]['rangers'])
+    m.addConstr(quicksum(X[r,j] for r in R) <= 1.1*sorted_jobs[j]['rangers'])
 for r in R:    
     # Ranger do not exceed total number of workable hours.
-    m.addConstr(quicksum(X[r,j]*Jobs[j]['duration'] for j in J) <= tot_hours)
+    m.addConstr(quicksum(X[r,j]*sorted_jobs[j]['duration'] for j in J) <= tot_hours)
     
 
 m.optimize()
@@ -203,24 +205,28 @@ print("Maximum Total Skill Points",m.ObjVal)
 
 ### ERROR CHECKING/ EXTRA INFO ###
 #ALLOCATION OF JOBS
+
+
 for j in J:
     rangers_alocated = []
     for r in R:
         if X[r,j].x == 1:
             rangers_alocated.append(r)
-    print(Jobs[j]['title'], ":", rangers_alocated)
+    print(sorted_jobs[j]['title'], ":", rangers_alocated)
 
 #ALLOCATION OF HOURS (THIS IS KINDA NOT WORKING ATM)
 workable_hours = 0
 for j in J:
-    workable_hours += Jobs[j]['duration']
+    workable_hours += sorted_jobs[j]['duration']
     
-
+rangers_hours = {}
 tot_hours_worked = 0
 for r in R:
     hours_worked = 0
     for j in J:
-        hours_worked += X[r,j].x*Jobs[j]['duration']
+        hours_worked += X[r,j].x*sorted_jobs[j]['duration']
     tot_hours_worked += hours_worked 
-    print("Ranger", r, ":", hours_worked, "hours")
-print("Workable Hours", workable_hours, "Total Hours Worked", tot_hours_worked)
+    rangers_hours[r] = hours_worked
+
+print(sorted(rangers_hours.items(), key= lambda x:x[1]))
+print("hours workable:", workable_hours, "total hours worked:", sum(rangers_hours.values()))

@@ -214,11 +214,8 @@ for j in J:
 for t in T:   
     for r in R:        
         #Rangers do not exceed maximum workable hours per day
-        #m.addConstr(quicksum(Q[j,t]*X[r,j]*Jobs[j]['duration'] for j in J) <= u*Z[r,t])
-        m.addConstr(quicksum(X[r,j]*Jobs[j]['duration'] for j in J) <= u*Z[r,t])
-        for j in J:
-            m.addConstr(Q[j,t]*X[r,j] == Z[r,t])
-        
+        m.addConstr(quicksum(Q[j,t]*X[r,j]*Jobs[j]['duration'] for j in J) <= u*Z[r,t])
+
     for r in family:
         #Rangers with family constraints don't work 2 days in a row
         m.addConstr(Z[r,T[t-1]] + Z[r, t] <= 1.9)
@@ -240,51 +237,44 @@ print("Maximum Total Skill Points",m.ObjVal)
 #%%
 ### ERROR CHECKING/ EXTRA INFO ###
 # CLASHES
+
+ranger_hours = np.zeros(len(R))
 for t in T:
     print("Day:", Days[t], "------------------------------------")
-    # for j in J:
-    #     rangers_alocated = []
-    #     if Q[j,t].x == 1:
-    #         for r in R:
-    #             if X[r,j].x == 1:
-    #                 rangers_alocated.append(r)
-    #         print(Jobs[j]['title'], ":", rangers_alocated)
+    for j in J:
+        rangers_alocated = []
+        if Q[j,t].x == 1:
+            for r in R:
+                if X[r,j].x == 1:
+                    rangers_alocated.append(r)
+            print("Job", j, ":", rangers_alocated)
+            #print(Jobs[j]['title'], ":", rangers_alocated)
             
     hours_dict = {}
     for r in R:
         hours_worked = 0
         for j in J:
-                hours_worked += Jobs[j]['duration']*X[r,t].x*Q[j,t].x
-        if Z[r,t].x == 1:
-            hours_dict[str(r)] = hours_worked
-    print(hours_dict)
+            if Q[j,t].x == 1: #job is conducted this day
+                hours_worked += Jobs[j]['duration']*X[r,j].x
+        ranger_hours[r] += hours_worked     
+        print("ranger", r, "worked", hours_worked, 'hours')
+
+print("TOTAL HOURS ----------")
+for r in R:
+    print("ranger", r, "worked total", ranger_hours[r], 'hours')
+    if ranger_hours[r] > tot_hours:
+        print("Solution Error: Total Hours exceeded")
+
+
+        
+for j in J:
+    for clash in clashes:
+        C = X[clash[0],j].x + X[clash[1],j].x 
+        #print(Jobs[j]['title'], "clash total is:", C)
+    if C == 2:
+        print("Solution Error: Clashing Workers")
+        
+
+
+
     
-            
-            
-# for j in J:
-#     for clash in clashes:
-#         C = X[clash[0],j].x + X[clash[1],j].x 
-#     print(Jobs[j]['title'], "clash total is:", C)
-
-# #ALLOCATION OF JOBS
-# for j in J:
-#     rangers_alocated = []
-#     for r in R:
-#         if X[r,j].x == 1:
-#             rangers_alocated.append(r)
-#     print(Jobs[j]['title'], ":", rangers_alocated)
-
-# #ALLOCATION OF HOURS
-# workable_hours = 0
-# for j in J:
-#     workable_hours += Jobs[j]['rangers']*Jobs[j]['duration']
-    
-
-# tot_hours_worked = 0
-# for r in R:
-#     hours_worked = 0
-#     for j in J:
-#         hours_worked += X[r,j].x*Jobs[j]['duration']
-#     tot_hours_worked += hours_worked 
-#     print("Ranger", r, ":", hours_worked, "hours")
-# print("Workable Hours", workable_hours, "Total Hours Worked", tot_hours_worked)

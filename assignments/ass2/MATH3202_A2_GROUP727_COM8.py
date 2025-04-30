@@ -246,31 +246,43 @@ for t in T:
                 if X[r,j,t].x == 1:
                     rangers_alocated.append(r)
             print(Jobs[j]['title'], ":", rangers_alocated)
+
+
             
 # for j in J:
 #     for clash in clashes:
 #         C = X[clash[0],j].x + X[clash[1],j].x 
 #     print(Jobs[j]['title'], "clash total is:", C)
 
-# #ALLOCATION OF JOBS
-# for j in J:
-#     rangers_alocated = []
-#     for r in R:
-#         if X[r,j].x == 1:
-#             rangers_alocated.append(r)
-#     print(Jobs[j]['title'], ":", rangers_alocated)
+#ALLOCATION OF JOBS
 
-# #ALLOCATION OF HOURS
-# workable_hours = 0
-# for j in J:
-#     workable_hours += Jobs[j]['rangers']*Jobs[j]['duration']
+for t in T:
+    print(Days[t], ".........................................")
+    for j in J:
+        rangers_alocated = []
+        for r in R:
+            if X[r,j,t].x == 1:
+                rangers_alocated.append(r)
+                print(Jobs[j]['title'], ":", rangers_alocated)
+
+#ALLOCATION OF HOURS
+workable_hours = 0
+for j in J:
+    workable_hours += Jobs[j]['rangers']*Jobs[j]['duration']
     
 
-# tot_hours_worked = 0
-# for r in R:
-#     hours_worked = 0
-#     for j in J:
-#         hours_worked += X[r,j].x*Jobs[j]['duration']
-#     tot_hours_worked += hours_worked 
-#     print("Ranger", r, ":", hours_worked, "hours")
-# print("Workable Hours", workable_hours, "Total Hours Worked", tot_hours_worked)
+tot_hours_worked = 0
+rangers_hours = {r : 0 for r in R}
+for t in T:
+    print(Days[t], ".........................................")
+    for r in R:
+        hours_worked = 0
+        for j in J:
+            hours_worked += X[r,j,t].x*Jobs[j]['duration']
+        tot_hours_worked += hours_worked 
+        rangers_hours[r] += hours_worked
+        print("Ranger", r, ":", hours_worked, "hours")
+    print("Workable Hours", workable_hours, "Total Hours Worked", tot_hours_worked)
+print(sorted(rangers_hours.items(), key=lambda x:x[1]))
+
+print((0+9+13+17+21+22+23)/7)
