@@ -72,7 +72,7 @@ def V(j, s):
         _V[j,s] = (abs(s - target[j]), s)
     else:
         _V[j,s] = min((max(abs(a - target[j]), V(j + 1, s - a)[0]), a)
-                  for a in range(0, s + 1)) 
+                      for a in range(0, s + 1)) 
     return _V[j,s]
 
 print(V(0,100))
