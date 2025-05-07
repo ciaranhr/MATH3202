@@ -30,17 +30,16 @@ s
 """
 
 def pig_management(t, s, y):
-    #if (t, s, y) in _pig_plan:
-        #return _pig_plan[t, s, y]
     if t == 52:
         return (0, "end")
-    if y == 0:
-        _pig_plan[t, s, y] = (damage(t) * s) + pig_management(t + 1, s + reprod(s), y)[0], 0
-    elif y > 0:
-        _pig_plan[t, s, y] =  min((damage(t) * s + \
-                    pig_management(t + 1, s + reprod(s) - a * trap(s), y - a)[0], a)
-                    for a in range(min(5, y)))
-    
+    elif (t, s, y) not in _pig_plan:
+        if y == 0:
+            _pig_plan[t, s, y] = (damage(t) * s) + pig_management(t + 1, s + reprod(s), y)[0], 0
+        elif y > 0:
+            _pig_plan[t, s, y] =  min((damage(t) * s + \
+                        pig_management(t + 1, s + reprod(s) - a * trap(s), y - a)[0], a)
+                        for a in range(min(4, y)))
+        
     return _pig_plan[t, s, y]
 
 print(pig_management(0, 82, 27))
