@@ -100,12 +100,9 @@ def strategy(t,s,y):
     
     #Recursive Case
     elif (t, s, y) not in _strategy:
-        if y == 0:
-           _strategy[t,s, y] = (damage(t)*s) + strategy(t+1,reprod(s),y)[0],0
-        elif y > 0:
-            _strategy[t,s, y] = min((damage(t)*s + strategy(t+1,reprod(s)-a*trap(s),y-a)[0],a) 
+        _strategy[t,s, y] = min((damage(t)*s + strategy(t+1,reprod(s)-a*trap(s),y-a)[0],a) 
                                 for a in range(min(trap_max, y) + 1)) 
     return _strategy[t,s, y]
 
 
-print(strategy(0, 82, 1)) 
+print(strategy(0, 82, 27)) 
