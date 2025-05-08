@@ -15,7 +15,7 @@ def damage(t):
     dt = min(abs(t-17), abs((52+t)-17), abs(t-(52+17)))
     if dt < 7:
         d += 6*(1-(dt/7)**2)**2
-    return d    
+    return d   
 
 def trap(x):
     """pigs murdered for a single trap"""
