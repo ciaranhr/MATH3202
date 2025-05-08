@@ -34,9 +34,9 @@ def pig_management(t, s, y):
         return (0, "end")
     elif (t, s, y) not in _pig_plan:
         if y == 0:
-            _pig_plan[t, s, y] = (damage(t)*s) + pig_management(t+1, reprod(s), y)[0], 0
+            _pig_plan[t, s, y] = (damage(t) * s) + pig_management(t + 1, reprod(s), y)[0], 0
         elif y > 0:
-            _pig_plan[t, s, y] =  min((damage(t)*s + \
+            _pig_plan[t, s, y] =  min((damage(t) * s + \
                         pig_management(t+1, reprod(s)-a*trap(s), y-a)[0], a)
                         for a in range(min(5, y+1)))
         
