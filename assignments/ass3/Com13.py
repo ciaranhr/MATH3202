@@ -21,6 +21,11 @@ def trap(x):
     """pigs murdered for a single trap"""
     return round(.03*x)
 
+def trap_check(z):
+    if(z):
+        return 0
+    else:
+        return 1
 
 _pig_plan = {}
 """
@@ -29,18 +34,17 @@ s
 
 """
 
-def pig_management(t, s, y):
+def pig_management(t, s, y, z):
     if t == 52:
         return (50*s, "end")
-    elif (t, s, y) not in _pig_plan:
-        _pig_plan[t, s, y] =  min((damage(t)*s + \
-                            pig_management(t+1, reprod(s)-a*trap(s), y-a)[0], a)
-                            for a in range(min(5, y+1)))
-        
-    return _pig_plan[t, s, y]
+    elif (t, s, y, z) not in _pig_plan:
+        _pig_plan[t, s, y, z] = min ((damage(t)*s + damage(t)*a*4*trap_check(z) +\
+                                pig_management(t+1, reprod(s)-a*trap(s), y-a, a)[0], a)
+                                for a in range(min(5, y+1)))
+ 
 
-print(pig_management(0, 82, 27))
-for i in range(1):
-    print(i)
+    return _pig_plan[t, s, y, z]
+
+print(pig_management(0, 82, 27, 0))
 
 
