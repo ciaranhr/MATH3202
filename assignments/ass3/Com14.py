@@ -35,7 +35,7 @@ s
 def dpig_management(t, s, y, z):
     x = s//1
     p = s - x
-    return p*pig_management(t,s+1, y, z)[0] + (1-p)*pig_management(t,s, y, z)[0]
+    return p*pig_management(t,x+1, y, z)[0] + (1-p)*pig_management(t,x, y, z)[0]
     
 
 def pig_management(t, s, y, z):

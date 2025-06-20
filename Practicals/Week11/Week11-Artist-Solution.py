@@ -61,7 +61,8 @@ def artist2(i,S,n):
             sum(p[j][k]*(Price*min(k,n) + artist2(j,S+[j],n-min(k,n))[0]) for k in K), j, names[j]) 
             for j in Cities if j not in S)
 
-     
+
+  
       
     
     
